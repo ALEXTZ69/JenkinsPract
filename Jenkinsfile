@@ -30,10 +30,17 @@ pipeline {
         stage('Ejecutar Contenedor Node.js') {
             steps {
                 sh '''
-                    echo "Intentando ejecutar contenedor..."
-                    docker stop hola-mundo-node || true
-                    docker rm hola-mundo-node || true
+                    echo "Deteniendo contenedor anterior si existe..."
+                    docker ps -a | grep hola-mundo-node || echo "No hay contenedor previo"
+                    docker stop hola-mundo-node || echo "No se pudo detener el contenedor"
+                    docker rm hola-mundo-node || echo "No se pudo eliminar el contenedor"
+                    
+                    echo "Ejecutando nuevo contenedor..."
                     docker run -d --name hola-mundo-node -p 3000:3000 hola-mundo-node:latest
+                    
+                    echo "Verificando estado del contenedor:"
+                    docker ps | grep hola-mundo-node || echo "Contenedor no está corriendo"
+                    docker logs hola-mundo-node
                 '''
             }
         }
